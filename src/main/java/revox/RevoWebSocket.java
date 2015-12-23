@@ -2,6 +2,7 @@ package revox;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -48,8 +49,12 @@ public class RevoWebSocket {
         return stompSession;
     }
 
-    public boolean isDone() {
-        return stompSession.isDone();
+    public boolean isConnected() {
+        try {
+            return stompSession.get().isConnected();
+        } catch (InterruptedException | ExecutionException e) {
+        }
+        return false;
     }
 
     private HttpHeaders getHttpHeaders(String email, String password) {
@@ -89,7 +94,7 @@ class SessionException extends Exception {
     }
 }
 
-class RevoStompHandler<T> extends StompSessionHandlerAdapter {
+class RevoStompHandler<T> implements StompFrameHandler {
     private Type aClass;
     private Consumer<T> consumer;
 
@@ -99,12 +104,12 @@ class RevoStompHandler<T> extends StompSessionHandlerAdapter {
     }
 
     @Override
-    public void handleFrame(StompHeaders headers, Object payload) {
-        consumer.accept((T) payload);
+    public Type getPayloadType(StompHeaders headers) {
+        return aClass;
     }
 
     @Override
-    public Type getPayloadType(StompHeaders headers) {
-        return aClass;
+    public void handleFrame(StompHeaders headers, Object payload) {
+        consumer.accept((T) payload);
     }
 }
