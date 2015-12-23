@@ -75,16 +75,14 @@ open test/revox/RevoxApplicationTests
 see  RevoWebSocket   for revo impl
 
 
-    @Test
-    public void testsend() throws Exception {
         RevoWebSocket revoWebSocket = new RevoWebSocket("localhost:8080/hello", "revo", "revo");
         revoWebSocket.Connect();
-        while (!revoWebSocket.isDone()) {
+        if (revoWebSocket.isConnected()) {
+            revoWebSocket.subscribe("/user/topic/greetings", new RevoStompHandler<>(Message.class, m ->
+                    System.out.println(m.getContent())
+            ));
+            revoWebSocket.send("/app/hello", new Message("lovex"));
+            Thread.sleep(100);
         }
-        revoWebSocket.subscribe("/user/topic/greetings", new RevoStompHandler<>(Message.class, m ->
-                System.out.println(m.getContent())
-        ));
-        revoWebSocket.send("/app/hello", new Message("lovex"));
-        Thread.sleep(1000);
     }
 
