@@ -8,7 +8,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import revox.messages.ConversationMessage;
+import revox.messages.Message;
 import revox.repository.userRepository;
 
 import java.security.Principal;
@@ -30,7 +30,7 @@ class controller {
     }
 
     @MessageMapping("/hello")
-    public void greeting(ConversationMessage message, Principal principal) {
+    public void greeting(Message message, Principal principal) {
 
         simpUserRegistry.getUsers().forEach(simpUser -> System.out.println(simpUser.getName()));
 

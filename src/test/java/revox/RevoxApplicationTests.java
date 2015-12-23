@@ -14,9 +14,8 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-import revox.messages.ConversationMessage;
+import revox.messages.Message;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -39,7 +38,7 @@ public class RevoxApplicationTests {
         httpHeaders.add("Authorization", "Basic " + base64Creds);
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders);
 
-        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl,headers, new StompSessionHandlerAdapter() {
+        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl, headers, new StompSessionHandlerAdapter() {
         });
 
         connect.addCallback(new ListenableFutureCallback<StompSession>() {
@@ -50,21 +49,9 @@ public class RevoxApplicationTests {
             @Override
             public void onSuccess(StompSession result) {
                 result.subscribe("/user/topic/greetings", new StompSessionHandlerAdapter() {
-                    @Override
-                    public Type getPayloadType(StompHeaders headers) {
-                        return ConversationMessage.class;
-                    }
-
-                    @Override
-                    public void handleFrame(StompHeaders headers, Object payload) {
-                        ConversationMessage message = (ConversationMessage) payload;
-                        System.out.println(message.getContent());
-                    }
                 });
             }
         });
-
-
         connect.addCallback(new ListenableFutureCallback<StompSession>() {
             @Override
             public void onFailure(Throwable ex) {
@@ -74,7 +61,7 @@ public class RevoxApplicationTests {
             public void onSuccess(StompSession result) {
                 StompHeaders stompHeaders = new StompHeaders();
                 stompHeaders.setDestination("/app/hello");
-                ConversationMessage payload = new ConversationMessage();
+                Message payload = new Message();
                 payload.setContent("ddddddd");
                 result.send(stompHeaders, payload);
             }
