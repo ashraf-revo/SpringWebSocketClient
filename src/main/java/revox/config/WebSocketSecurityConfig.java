@@ -12,7 +12,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
-//        messages.anyMessage().authenticated();
+        messages.anyMessage().authenticated();
     }
 
     @Override

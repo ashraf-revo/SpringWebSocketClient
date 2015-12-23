@@ -26,10 +26,11 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
+        http.authorizeRequests().antMatchers("/**").authenticated().and()
+                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
                 and().formLogin().and().rememberMe().rememberMeServices(rememberMeServices()).key(key)
                 .and()
-                .headers().frameOptions().sameOrigin();
+                .headers().frameOptions().sameOrigin().and().httpBasic();
     }
 
     @Bean

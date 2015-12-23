@@ -2,10 +2,8 @@ package revox;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +24,6 @@ class controller {
     @Autowired
     SimpUserRegistry simpUserRegistry;
 
-    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/")
     public String login() {
         return "redirect:/index.html";
@@ -34,22 +31,17 @@ class controller {
 
     @MessageMapping("/hello")
     public void greeting(ConversationMessage message, Principal principal) {
-        System.out.println(message.getContent());
-        sendingOperations.convertAndSendToUser(
+
+        simpUserRegistry.getUsers().forEach(simpUser -> System.out.println(simpUser.getName()));
+
+        simpMessagingTemplate.convertAndSendToUser(
                 principal.getName(), "/topic/greetings",
                 message.setContent("welcome " + message.getContent()));
 
     }
 
-    @MessageMapping("/hellox")
-    @SendTo("/topic/greetings")
-    public ConversationMessage greetingd(ConversationMessage message) {
-        System.out.println(message.getContent());
-        return message;
-    }
-
     @Autowired
-    SimpMessagingTemplate sendingOperations;
+    SimpMessagingTemplate simpMessagingTemplate;
 
     @RequestMapping("/csrf")
     @ResponseBody

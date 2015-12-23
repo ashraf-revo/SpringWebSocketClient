@@ -1,14 +1,13 @@
 package revox.domain;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Created by ashraf on 8/2/15.
@@ -18,13 +17,9 @@ public class user {
     @Id
     @GeneratedValue
     Long id;
-    @Column(length = 30)
     String userName;
-    @Column(length = 30)
     String email;
-    @Column(length = 60)
     String password;
-    String imgPath;
     int role;
 
 
@@ -68,15 +63,6 @@ public class user {
 
     public user setPassword(String password) {
         this.password = password;
-        return this;
-    }
-
-    public String getImgPath() {
-        return imgPath;
-    }
-
-    public user setImgPath(String imgPath) {
-        this.imgPath = imgPath;
         return this;
     }
 

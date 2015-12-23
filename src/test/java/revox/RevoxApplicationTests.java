@@ -1,12 +1,14 @@
 package revox;
 
 import org.junit.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -16,12 +18,10 @@ import revox.messages.ConversationMessage;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringApplicationConfiguration(classes = RevoxApplication.class)
-//@WebAppConfiguration
 public class RevoxApplicationTests {
 
     @Test
@@ -33,7 +33,13 @@ public class RevoxApplicationTests {
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         String stompUrl = "ws://localhost:8080/hello";
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl, new StompSessionHandlerAdapter() {
+        String plainCreds = "revo:revo";
+        String base64Creds = new String(Base64.getEncoder().encode(plainCreds.getBytes()));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Authorization", "Basic " + base64Creds);
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders);
+
+        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl,headers, new StompSessionHandlerAdapter() {
         });
 
         connect.addCallback(new ListenableFutureCallback<StompSession>() {
@@ -43,7 +49,7 @@ public class RevoxApplicationTests {
 
             @Override
             public void onSuccess(StompSession result) {
-                result.subscribe("/topic/greetings", new StompSessionHandlerAdapter() {
+                result.subscribe("/user/topic/greetings", new StompSessionHandlerAdapter() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return ConversationMessage.class;
@@ -67,7 +73,7 @@ public class RevoxApplicationTests {
             @Override
             public void onSuccess(StompSession result) {
                 StompHeaders stompHeaders = new StompHeaders();
-                stompHeaders.setDestination("/app/hellox");
+                stompHeaders.setDestination("/app/hello");
                 ConversationMessage payload = new ConversationMessage();
                 payload.setContent("ddddddd");
                 result.send(stompHeaders, payload);

@@ -1,6 +1,13 @@
 spring websocket in the clint 
 
-WebSocketStompClient    WebSocketClient     SockJsClient
+websocket
+
+WebSocketStompClient    WebSocketClient     SockJsClient security   SimpUserRegistry
+
+user1  name:revo     password:revo
+user2  name:ashraf   password:revo
+
+open test/revox/RevoxApplicationTests
 
     @Test
     public void Main() throws InterruptedException, ExecutionException {
@@ -11,7 +18,13 @@ WebSocketStompClient    WebSocketClient     SockJsClient
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         String stompUrl = "ws://localhost:8080/hello";
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl, new StompSessionHandlerAdapter() {
+        String plainCreds = "revo:revo";
+        String base64Creds = new String(Base64.getEncoder().encode(plainCreds.getBytes()));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Authorization", "Basic " + base64Creds);
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders);
+
+        ListenableFuture<StompSession> connect = stompClient.connect(stompUrl,headers, new StompSessionHandlerAdapter() {
         });
 
         connect.addCallback(new ListenableFutureCallback<StompSession>() {
@@ -21,7 +34,7 @@ WebSocketStompClient    WebSocketClient     SockJsClient
 
             @Override
             public void onSuccess(StompSession result) {
-                result.subscribe("/topic/greetings", new StompSessionHandlerAdapter() {
+                result.subscribe("/user/topic/greetings", new StompSessionHandlerAdapter() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return ConversationMessage.class;
@@ -45,7 +58,7 @@ WebSocketStompClient    WebSocketClient     SockJsClient
             @Override
             public void onSuccess(StompSession result) {
                 StompHeaders stompHeaders = new StompHeaders();
-                stompHeaders.setDestination("/app/hellox");
+                stompHeaders.setDestination("/app/hello");
                 ConversationMessage payload = new ConversationMessage();
                 payload.setContent("ddddddd");
                 result.send(stompHeaders, payload);

@@ -35,9 +35,5 @@ public class webSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/hello").withSockJS();
-//        RequestUpgradeStrategy upgradeStrategy = new TomcatRequestUpgradeStrategy();
-//        registry.addEndpoint("/hello")
-//                .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy))
-//                .setAllowedOrigins("*");
     }
 }
