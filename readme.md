@@ -1,11 +1,6 @@
+Spring Boot  WebSocket
+
 spring websocket in the clint 
-
-
-spring boot websocket
-
-websocket spring boot
-
-
 
 WebSocketStompClient    WebSocketClient     SockJsClient security   SimpUserRegistry
 
